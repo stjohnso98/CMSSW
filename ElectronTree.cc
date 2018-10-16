@@ -379,15 +379,15 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	NJets++;
       }
     }
-    for(reco::Muon const& mu : *muon){
-      MuonPt[NMuons] = mu.pt(); 
-      MuonEta[NMuons] = mu.eta();                                            
-      MuonPhi[NMuons] = mu.phi();                                            
-      MuonEnergy[NMuons] = mu.energy();
-      if(NMuons>999) cout<<"more than 1000 muons, please change array size"<<endl;
-      NMuons++;
+    // for(reco::Muon const& mu : *muon){
+    //   MuonPt[NMuons] = mu.pt(); 
+    //   MuonEta[NMuons] = mu.eta();                                            
+    //   MuonPhi[NMuons] = mu.phi();                                            
+    //   MuonEnergy[NMuons] = mu.energy();
+    //   if(NMuons>999) cout<<"more than 1000 muons, please change array size"<<endl;
+    //   NMuons++;
 
-    }
+    // }
     reco::MET const& met=mets->front();
     METPt = met.pt();
     METPhi = met.phi();
