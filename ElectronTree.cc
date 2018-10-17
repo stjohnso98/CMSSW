@@ -380,12 +380,12 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
     // for(reco::Muon const& mu : *muon){
-    //   MuonPt[NMuons] = mu.pt(); 
-    //   MuonEta[NMuons] = mu.eta();                                            
-    //   MuonPhi[NMuons] = mu.phi();                                            
-    //   MuonEnergy[NMuons] = mu.energy();
-    //   if(NMuons>999) cout<<"more than 1000 muons, please change array size"<<endl;
-    //   NMuons++;
+    //  MuonPt[NMuons] = mu.pt(); 
+    // MuonEta[NMuons] = mu.eta();                                            
+    // MuonPhi[NMuons] = mu.phi();                                            
+    //  MuonEnergy[NMuons] = mu.energy();
+    //  if(NMuons>999) cout<<"more than 1000 muons, please change array size"<<endl;
+    //  NMuons++;
 
     // }
     reco::MET const& met=mets->front();
@@ -495,13 +495,13 @@ void ElectronTree::ClearVariables(){
     JetEmEnergy[i] =d1;
     JetHadronEnergy[i] =d1;
   }
-  NMuons = 0;
-  for(int i =0;i<1000;i++){
-    MuonPt[i]=d1;
-    MuonEta[i]=d1;
-    MuonPhi[i]=d1;
-    MuonEnergy[i]= d1;
-  }
+  // NMuons = 0;
+  // for(int i =0;i<1000;i++){
+  //  MuonPt[i]=d1;
+  //  MuonEta[i]=d1;
+  //  MuonPhi[i]=d1;
+  //  MuonEnergy[i]= d1;
+  // }
   NMC=0;
   for(int i=0; i<5000; i++){
     MCPt[i]= d1;
