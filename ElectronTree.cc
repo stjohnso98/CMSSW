@@ -296,13 +296,13 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if (vertices->empty()) return;
   const reco::Vertex &PV = vertices->front();
 
-  for(const reco::Muon &mu : *muon){
-    Lepton m;
-    m.v.SetPxPyPzE(mu.px(),mu.py(),mu.pz(),mu.energy());
-    m.Charge = mu.charge();
-    if(m.v.Pt()>10 && fabs(m.v.Eta())<2.4) //contains both loose or tight electron
-      Muons.push_back(m);
-  }
+  //for(const reco::Muon &mu : *muon){
+  //  Lepton m;
+  // m.v.SetPxPyPzE(mu.px(),mu.py(),mu.pz(),mu.energy());
+  // m.Charge = mu.charge();
+  //if(m.v.Pt()>10 && fabs(m.v.Eta())<2.4) //contains both loose or tight electron
+      //  Muons.push_back(m);
+  //}
   for(reco::GsfElectron const& ele : *electrons){
     Lepton e;
     e.v.SetPxPyPzE(ele.px(),ele.py(),ele.pz(),ele.energy());
@@ -311,17 +311,17 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       Electrons.push_back(e);
   }
   
-  Sort(1);
+  // Sort(1);
   Sort(2);
-  if((int)Muons.size()>1){
-    double mass=(Muons.at(0).v + Muons.at(1).v).M();
-    if(mass>81 && mass<101) isZfromMu=true;
-  }
+  // if((int)Muons.size()>1){
+  //  double mass=(Muons.at(0).v + Muons.at(1).v).M();
+  //  if(mass>81 && mass<101) isZfromMu=true;
+  // }
 
-  if((int)Electrons.size()>1){
-    double mass=(Electrons.at(0).v + Electrons.at(1).v).M();
-    if(mass>81 && mass<101) isZfromE=true;
-  }
+  // if((int)Electrons.size()>1){
+  //  double mass=(Electrons.at(0).v + Electrons.at(1).v).M();
+  //  if(mass>81 && mass<101) isZfromE=true;
+  // }
 
   //Filling the tree
   //  if(isZfromMu && (int)electrons->size()>0){
