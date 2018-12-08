@@ -5,5 +5,5 @@ For 53X:
 cmsrel CMSSW_5_3_32
 cd CMSSW_5_3_32/src
 cmsenv
-git clone git@           # not including any corrections right now
+git clone git@github.com:stjohnso98/CMSSW.git           # not including any corrections right now
 scram b -rj16
