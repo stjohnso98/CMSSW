@@ -6,10 +6,10 @@
 // 
 /**\class ElectronTree ElectronTree.cc Demo/ElectronTree/src/ElectronTree.cc
 
- Description: [one line class summary]
+ Description: Constructs Tree of observables of electron and associated particles
 
  Implementation:
-     [Notes on implementation]
+     Use DriverScript.py to run this code. This code is for constructing trees from AOD. Give location of your AOD in DriverScript.py
 */
 //
 // Original Author:  Steenu Johnson
@@ -62,7 +62,7 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourInfo.h"
 //
-// class decleration
+
 //
 
 struct Lepton{
@@ -73,6 +73,8 @@ struct Lepton{
 };
 std::vector<Lepton> Muons;
 std::vector<Lepton> Electrons;
+
+// class decleration
 
 class ElectronTree : public edm::EDAnalyzer {
 public:
@@ -276,7 +278,8 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   using namespace reco;
 
   ClearVariables();
-
+	
+// Get objects of interest from AOD
   Handle<reco::TrackCollection> tracks;
   iEvent.getByLabel("generalTracks", tracks);
   Handle<CaloTowerCollection> ct;
@@ -306,6 +309,7 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //if(m.v.Pt()>10 && fabs(m.v.Eta())<2.4) //contains both loose or tight electron
       //  Muons.push_back(m);
   //}
+	// Loop over all electrons
   for(reco::GsfElectron const& ele : *electrons){
     Lepton e;
     e.v.SetPxPyPzE(ele.px(),ele.py(),ele.pz(),ele.energy());
@@ -315,13 +319,13 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   
   // Sort(1);
-  Sort(2);
+  Sort(2); // Sort the electrons in descending order of transverse momentum
   // if((int)Muons.size()>1){
   //  double mass=(Muons.at(0).v + Muons.at(1).v).M();
   //  if(mass>81 && mass<101) isZfromMu=true;
   // }
 
-  if((int)Electrons.size()>1){
+  if((int)Electrons.size()>1){ // If there is exists two or more electrons, check if the invariant mass of two leading electrons is above Z mass
     double mass=(Electrons.at(0).v + Electrons.at(1).v).M();
     if(mass>81) onOrAboveZ=true;
   }
@@ -449,7 +453,7 @@ ElectronTree::beginJob()
 void 
 ElectronTree::endJob() {
 }
-void ElectronTree::ClearVariables(){
+void ElectronTree::ClearVariables(){ // Initializing all branches before looking at each event
   NTowers=0;
   isZfromMu=false;
   onOrAboveZ=false;
@@ -532,7 +536,7 @@ void ElectronTree::ClearVariables(){
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(ElectronTree);
-void ElectronTree::Sort(int opt)
+void ElectronTree::Sort(int opt) //Sort with respect to transverse momentum
 {
   if(opt==1){
     for(int i=0; i<(int)Muons.size()-1; i++){
@@ -551,7 +555,7 @@ void ElectronTree::Sort(int opt)
     }
   }
 }
-double ElectronTree::electronEA(reco::GsfElectron const& it){
+double ElectronTree::electronEA(reco::GsfElectron const& it){ //Effective area of electron
   double eta= fabs(it.superCluster()->eta());
   if(eta<1.0000) return 0.13;
   else if(eta<1.4790) return 0.14;
@@ -561,7 +565,7 @@ double ElectronTree::electronEA(reco::GsfElectron const& it){
   else if(eta<2.4000) return 0.11;
   else return 0.14; 
 }
-double ElectronTree::electronPFIsolation(reco::GsfElectron const& it,double rhoValue_){
+double ElectronTree::electronPFIsolation(reco::GsfElectron const& it,double rhoValue_){ // Isolation of electron
   reco::GsfElectron::PflowIsolationVariables pfIso = it.pfIsolationVariables();
   double isoChargedHadrons = pfIso.chargedHadronIso;
 
@@ -573,7 +577,7 @@ double ElectronTree::electronPFIsolation(reco::GsfElectron const& it,double rhoV
   return iso;
 }
 
-bool ElectronTree::electronMediumCuts(reco::GsfElectron const& it, const reco::Vertex PV_){
+bool ElectronTree::electronMediumCuts(reco::GsfElectron const& it, const reco::Vertex PV_){ //Medium selections
   bool isMediumBarrel = ( fabs(it.superCluster()->position().eta()) <= 1.479     &&
 			  fabs(it.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
 			  fabs(it.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
@@ -597,7 +601,7 @@ bool ElectronTree::electronMediumCuts(reco::GsfElectron const& it, const reco::V
 
 }
 
-bool ElectronTree::electronTriggerCuts(reco::GsfElectron const& it){
+bool ElectronTree::electronTriggerCuts(reco::GsfElectron const& it){ //Trigger selections
   bool isTriggerBarrel = ( fabs(it.superCluster()->position().eta()) <= 1.479     &&
 			   fabs(it.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
 			   fabs(it.deltaPhiSuperClusterTrackAtVtx()) < 0.15 &&
@@ -619,7 +623,7 @@ bool ElectronTree::electronTriggerCuts(reco::GsfElectron const& it){
   return isTriggerBarrel || isTriggerEndcap;
 
 }
-const reco::Candidate* ElectronTree::getmother(const reco::Candidate* particle)//Finds mother of the particle
+const reco::Candidate* ElectronTree::getmother(const reco::Candidate* particle)//Finds mother of the particle by recursion
 {
   const reco::Candidate* mo;
   mo = particle;
