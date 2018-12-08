@@ -60,6 +60,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "SimDataFormats/JetMatching/interface/JetFlavourInfo.h"
 //
 // class decleration
 //
@@ -136,6 +137,7 @@ private:
   double JetEnergy[1000];
   double JetEmEnergy[1000];
   double JetHadronEnergy[1000];
+  double JetHadronFlavour[1000];
   int NMuons;
   double MuonPt[1000];
   double MuonEta[1000];
@@ -144,7 +146,7 @@ private:
   double METPt;
   double METPhi;
   bool isZfromMu;
-  bool isZfromE;
+  bool onOrAboveZ;
   int NMC;
   double MCPt[5000];
   double MCEta[5000];
@@ -227,6 +229,7 @@ ElectronTree::ElectronTree(const edm::ParameterSet& iConfig) :
   OutputTree->Branch("JetEnergy", &JetEnergy, "JetEnergy[NJets]/D");
   OutputTree->Branch("JetEmEnergy", &JetEmEnergy, "JetEmEnergy[NJets]/D");
   OutputTree->Branch("JetHadronEnergy", &JetHadronEnergy, "JetHadronEnergy[NJets]/D");
+  OutputTree->Branch("JetHadronFlavour",&JetHadronFlavour,"JetHadronFlavour[NJets]/D");
   OutputTree->Branch("NMuons", &NMuons, "NMuons/I");
   OutputTree->Branch("MuonPt", &MuonPt, "MuonPt[NMuons]/D");  
   OutputTree->Branch("MuonEta", &MuonEta, "MuonEta[NMuons]/D");
@@ -318,15 +321,15 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //  if(mass>81 && mass<101) isZfromMu=true;
   // }
 
-  // if((int)Electrons.size()>1){
-  //  double mass=(Electrons.at(0).v + Electrons.at(1).v).M();
-  //  if(mass>81 && mass<101) isZfromE=true;
-  // }
+  if((int)Electrons.size()>1){
+    double mass=(Electrons.at(0).v + Electrons.at(1).v).M();
+    if(mass>81) onOrAboveZ=true;
+  }
 
   //Filling the tree
   //  if(isZfromMu && (int)electrons->size()>0){
-  // if(isZfromE){
-  if((int)electrons->size()>0){
+  if(onOrAboveZ){
+  //if((int)electrons->size()>0){
     for(CaloTower const& cal : *ct){
       TowerEta[NTowers]=cal.eta();
       TowerPhi[NTowers]=cal.phi();
@@ -375,6 +378,7 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	JetEnergy[NJets] = j.energy();
 	JetEmEnergy[NJets] = j.chargedEmEnergy()+j.neutralEmEnergy();
 	JetHadronEnergy[NJets] = j.chargedHadronEnergy()+ j.neutralHadronEnergy();
+	JetHadronFlavour[NJets] = j.;
 	if(NJets>999) cout<<"Change array size of electrons"<<endl;
 	NJets++;
       }
@@ -418,6 +422,8 @@ ElectronTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  NMC++;
 	}
       }
+      //Handle<reco::GenJetCollection> genjet;
+      //iEvent.getByLabel("",genjet);
     }
     OutputTree->Fill();
   }
@@ -446,7 +452,7 @@ ElectronTree::endJob() {
 void ElectronTree::ClearVariables(){
   NTowers=0;
   isZfromMu=false;
-  isZfromE=false;
+  onOrAboveZ=false;
   double d1=54321;
   Muons.clear();
   Electrons.clear();
@@ -494,6 +500,7 @@ void ElectronTree::ClearVariables(){
     JetEnergy[i]= d1;
     JetEmEnergy[i] =d1;
     JetHadronEnergy[i] =d1;
+    JetHadronFlavour[i]=d1;
   }
   // NMuons = 0;
   // for(int i =0;i<1000;i++){
